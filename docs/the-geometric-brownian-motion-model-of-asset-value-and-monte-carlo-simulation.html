@@ -217,10 +217,10 @@ a scaled log-normal. This is helpful, e.g., for comparing the exact distribution
 <pre><code>##      statistic     data set 1     data set 2     data set 3
 ## ---------------------------------------------
 ##           size             NA      10000.000      10000.000
-##            min             NA         26.977         30.736
-##            max             NA        480.490        385.192
-##           mean        110.517        110.731        110.165
-##          stdev         40.327         39.860         40.244</code></pre>
+##            min             NA         29.106         22.336
+##            max             NA        340.906        371.492
+##           mean        110.517        109.804        109.838
+##          stdev         40.327         39.456         39.418</code></pre>
 <p>The simplest way to reduce MC variability (besides increasing the number of samples) is to use <em>anti-thetical variates</em>. When sampling standard normal random variates this amounts to sampling <span class="math inline">\(z\)</span> and using both <span class="math inline">\((z,-z)\)</span> as samples. To get <span class="math inline">\(2I\)</span> samples one only needs to actually compute <span class="math inline">\(I\)</span> samples, the remaining <span class="math inline">\(I\)</span> are the same in magnitude but with the opposite signs. This accomplishes exact mean-matching, i.e., <span class="math inline">\((2I)^{-1}\sum_{i=1}^{2I} z_i = 0\)</span>, exactly the standard normal distribution mean. <br></p>
 <p>Another method for reducing MC variability is second-moment matching. Suppose we generate antithetical samples <span class="math inline">\(z = (z_1, \ldots, z_I)\)</span>. Let <span class="math inline">\(z^\star_i := z_i / s_{z}\)</span> for <span class="math inline">\(i=1, \ldots, I\)</span> where <span class="math inline">\(s_z\)</span> is the sample standard deviation of <span class="math inline">\(z\)</span>. Now, <span class="math inline">\(z^\star\)</span> has sample mean exactly zero and sample standard deviation exactly <span class="math inline">\(1\)</span>. <br></p>
 <p>Further, a Box-Cox transformation may be used if the samples <span class="math inline">\(z\)</span> have positive skew. (If they have negative skew, then the samples may be reflected about the maximum value to produce a set of positively-skewed values starting from zero.) After applying the Box-cox transformation, the resulting values <span class="math inline">\(y\)</span> should be close to symmetric (closer to a normal distribution than the original variates) and a further standardization <span class="math inline">\(z^\star_i = (y_i - \overline y)/s_y\)</span> may be used to transform the values to approximately standard normal.</p>
@@ -287,14 +287,14 @@ a scaled log-normal. This is helpful, e.g., for comparing the exact distribution
 <span id="cb13-60"><a href="the-geometric-brownian-motion-model-of-asset-value-and-monte-carlo-simulation.html#cb13-60" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb13-61"><a href="the-geometric-brownian-motion-model-of-asset-value-and-monte-carlo-simulation.html#cb13-61" aria-hidden="true" tabindex="-1"></a>print_stats2()  </span></code></pre></div>
 <pre><code>##      statistic     data set 1     data set 2     data set 3     data set 4     data set 5     data set 6     data set 7     data set 8
-##      mean mean          0.000          0.001         -0.000         -0.000         -0.000          0.000          0.000         -0.000
+##      mean mean         -0.000         -0.000          0.000          0.000         -0.000         -0.000          0.000         -0.000
 ##       std mean          0.010          0.010          0.000          0.000          0.000          0.000          0.000          0.000
-##       mean std          1.001          0.999          0.999          1.000          1.000          1.000          1.000          1.000
-##        std std          0.014          0.015          0.021          0.019          0.000          0.000          0.000          0.000
-##  mean kurtosis         -0.001          0.001         -0.000          0.000         -0.011         -0.010         -0.000         -0.000
+##       mean std          1.000          0.999          0.999          1.000          1.000          1.000          1.000          1.000
+##        std std          0.014          0.013          0.020          0.020          0.000          0.000          0.000          0.000
+##  mean kurtosis          0.001          0.000         -0.000          0.000         -0.010         -0.011         -0.000          0.000
 ##   std kurtosis          0.024          0.024          0.000          0.000          0.007          0.007          0.000          0.000
-##      mean skew         -0.000         -0.001         -0.004          0.002          0.001          0.006         -0.004          0.002
-##       std skew          0.050          0.051          0.069          0.071          0.066          0.068          0.069          0.071</code></pre>
+##      mean skew         -0.002         -0.001          0.001         -0.005          0.006          0.000          0.001         -0.005
+##       std skew          0.049          0.050          0.069          0.072          0.066          0.069          0.069          0.072</code></pre>
 
 </div>
 </div>

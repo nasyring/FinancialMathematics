@@ -16,4 +16,8 @@ BuildType: Website
 
 PythonType: conda
 PythonVersion: 3.9.13
+<<<<<<< HEAD
 PythonPath: E:/Anaconda/python.exe
+=======
+PythonPath: C:/Users/nsyring/Anaconda3/python.exe
+>>>>>>> b74dd3f4cf26fb18fbf78b7b2d3ad67ea4de6462
