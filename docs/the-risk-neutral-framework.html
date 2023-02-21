@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 3 The risk-neutral framework | FinancialMathematics</title>
+<meta name="author" content="Nick Syring">
+<meta name="description" content="A key concept to understanding this section is the existence of a risk-free interest rate \(r\) at which one may invest cash to accumulate into the future with no chance of loss/default. In...">
+<meta name="generator" content="bookdown 0.29 with bs4_book()">
+<meta property="og:title" content="Chapter 3 The risk-neutral framework | FinancialMathematics">
+<meta property="og:type" content="book">
+<meta property="og:description" content="A key concept to understanding this section is the existence of a risk-free interest rate \(r\) at which one may invest cash to accumulate into the future with no chance of loss/default. In...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 3 The risk-neutral framework | FinancialMathematics">
+<meta name="twitter:description" content="A key concept to understanding this section is the existence of a risk-free interest rate \(r\) at which one may invest cash to accumulate into the future with no chance of loss/default. In...">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.4.0/transition.js"></script><script src="libs/bs3compat-0.4.0/tabs.js"></script><script src="libs/bs3compat-0.4.0/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
+
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">FinancialMathematics</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
+    </div>
+
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html"><span class="header-section-number">1</span> Introduction</a></li>
+<li><a class="" href="intro.html"><span class="header-section-number">2</span> Introduction</a></li>
+<li><a class="active" href="the-risk-neutral-framework.html"><span class="header-section-number">3</span> The risk-neutral framework</a></li>
+<li><a class="" href="the-geometric-brownian-motion-model-of-asset-value-and-monte-carlo-simulation.html"><span class="header-section-number">4</span> The geometric Brownian motion model of asset value and Monte Carlo simulation</a></li>
+</ul>
+
+        <div class="book-extra">
+          
+        </div>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="the-risk-neutral-framework" class="section level1" number="3">
+<h1>
+<span class="header-section-number">3</span> The risk-neutral framework<a class="anchor" aria-label="anchor" href="#the-risk-neutral-framework"><i class="fas fa-link"></i></a>
+</h1>
+<p>A key concept to understanding this section is the existence of a risk-free interest rate <span class="math inline">\(r\)</span> at which one may invest cash to accumulate into the future with no chance of loss/default. In practice, US treasury rates or LIBOR may be used as near-riskless rates.</p>
+<div id="forwards" class="section level2" number="3.1">
+<h2>
+<span class="header-section-number">3.1</span> Forwards<a class="anchor" aria-label="anchor" href="#forwards"><i class="fas fa-link"></i></a>
+</h2>
+<p>A forward is a promise now to buy an asset (think stock) at a prescribed future time <span class="math inline">\(T\)</span>. What should be the price of the forward, which is paid at time <span class="math inline">\(T\)</span>?</p>
+<p>Someone with experience in probability or statistics might come up with the following answer. Suppose we have a perfect model of the future price, say, <span class="math inline">\(\log S_T/S_0 = X\)</span> where <span class="math inline">\(X\sim N(\mu, \sigma^2)\)</span>; that is, the log price change is a normal fluctuation up or down. The price of the forward, say <span class="math inline">\(F\)</span>, is paid at time <span class="math inline">\(T\)</span>, so that the payoff of the forward is <span class="math inline">\(S_T - F\)</span>. The value of the payoff at time <span class="math inline">\(0\)</span> is <span class="math inline">\(e^{-rT}(S_T - F)\)</span> and the expected value of the payoff at time <span class="math inline">\(0\)</span> is
+<span class="math display">\[E(e^{-rT}(S_T - F)) = e^{-rT}\left[S_0e^{\mu + \sigma^2/2}-F\right].\]</span>
+It would seem that either the holder or the seller of the forward contract would be disadvantaged if <span class="math inline">\(F\)</span> is anything other than <span class="math inline">\(S_0e^{\mu + \sigma^2/2}\)</span>, but this is incorrect!</p>
+<p>Here’s why. Pretend you are the seller/writer of the forward contract. Borrow <span class="math inline">\(S_0\)</span> at time <span class="math inline">\(t=0\)</span> and buy one share. At time <span class="math inline">\(T\)</span> deliver the stock for <span class="math inline">\(K\)</span> and repay the loan of <span class="math inline">\(S_0e^{rT}\)</span>. If <span class="math inline">\(K &gt; S_0e^{rT}\)</span> you have made riskless profit, i.e., <em>arbitrage</em>. On the other hand, suppose you are the buyer/holder of the forward contract. Short a share at time <span class="math inline">\(0\)</span> and recieve <span class="math inline">\(S_0\)</span>, investing it at the risk free rate <span class="math inline">\(r\)</span>. At time <span class="math inline">\(T\)</span> you have <span class="math inline">\(S_0e^{rT}\)</span>, you buy the stock for <span class="math inline">\(F\)</span>, and you close your short position. If <span class="math inline">\(F &lt; S_0e^{rT}\)</span> you make riskless profit.</p>
+<p>The pricing lesson is that the forward price <span class="math inline">\(F\)</span> must simply be the current asset price accumulated at the risk-free rate; any other price results in arbitrage. The bigger picture lesson is that the probabilities of asset value changes were irrelevant—only the initial asset value and the risk free rate (information known at time 0) played a role in the arbitrage-free pricing of the forward contract. The phenomenon that arbitrage-free prices are agnostic towards probabilities of future asset value moves is known as <em>risk-neutrality</em>.</p>
+<p>Forwards are simple financial instruments, but it turns out that the above argument for risk-neutral pricing applies to arbitrary derivatives, as we will see next.</p>
+</div>
+<div id="risk-neutral-pricing-of-derivatives" class="section level2" number="3.2">
+<h2>
+<span class="header-section-number">3.2</span> Risk-neutral pricing of derivatives<a class="anchor" aria-label="anchor" href="#risk-neutral-pricing-of-derivatives"><i class="fas fa-link"></i></a>
+</h2>
+<p>Consider a derivative that provides a payoff based on the value of an underlying asset, for example, a stock. By modeling the stock’s future price moves we can replicate the derivative using a portfolio consisting of <span class="math inline">\((\phi, \psi)\)</span> units of the stock and a risk-free bond.</p>
+<p>Our model consists of probabilities of prescribed up or down moves at discrete time points. For example, the stock that has value <span class="math inline">\(S_0\)</span> at time <span class="math inline">\(0\)</span> either moves up to value <span class="math inline">\(S_2\)</span> at time 1 with probability <span class="math inline">\(p\)</span> or down to value <span class="math inline">\(S_1\)</span> at time <span class="math inline">\(1\)</span> with probability <span class="math inline">\(1-p\)</span>. The portfolio has value either <span class="math inline">\(\phi S_2 + \psi B_0e^{r}\)</span> or <span class="math inline">\(\phi S_1 + \psi B_0e^{r}\)</span> at time <span class="math inline">\(1\)</span>. And, the derivative has value either <span class="math inline">\(f(S_2)\)</span> or <span class="math inline">\(f(S_1)\)</span> at time <span class="math inline">\(1\)</span>. Set the potential portfolio values equal to the potential derivative values and solve for <span class="math inline">\(\phi, \psi\)</span>, yielding
+<span class="math display">\[\phi = \frac{f(S_2)-f(S_1)}{S_2 - S_1}\quad\text{and}\quad \psi = B_0^{-1}e^{-r}[f(S_2) - \phi S_2].\]</span></p>
+<p>The portfolio value at time 0 is
+<span class="math display">\[\phi S_0 + \psi B_0 = S_0 \frac{f(S_2)-f(S_1)}{S_2 - S_1} + e^{-r}\left\{f(S_2) - \frac{f(S_2)-f(S_1)}{S_2 - S_1}S_2\right\}.\]</span>
+This is an enforceable price for the derivative because any deviation up or down (in excess of bid-ask spreads) creates an arbitrage opportunity using the replicating portfolio and the derivative.</p>
+<p>Let <span class="math inline">\(q := (S_0 e^r - S_1)/(S_2-S_1)\)</span> and note that the portfolio value may be rewritten as
+<span class="math display">\[e^{-r}\left\{qf(S_2) + (1-q)f(S_1)\right\}.\]</span>
+This appears to be a discounted expected value. And, indeed, if <span class="math inline">\(q&lt;0\)</span> the future stock price is definitely higher than the bond’s future value, while if <span class="math inline">\(q&gt;1\)</span> the bond is certainly more valuable than the stock. Therefore <span class="math inline">\(q\in (0,1)\)</span> behaves like a probability. We call the probabilities <span class="math inline">\((q,1-q)\)</span> the <em>risk-neutral probabilities</em> or risk-neutral measure because they do not depend on the underlying true probabilities <span class="math inline">\((p,1-p)\)</span> of up and down stock moves; rather they are the result ofthe arbitrage-free market constraint.</p>
+</div>
+<div id="binomial-derivative-pricing-model" class="section level2" number="3.3">
+<h2>
+<span class="header-section-number">3.3</span> Binomial derivative pricing model<a class="anchor" aria-label="anchor" href="#binomial-derivative-pricing-model"><i class="fas fa-link"></i></a>
+</h2>
+<p>The previous argument for derivative pricing using a replicating portfolio based on up and down asset moves suggests a practical pricing model. In real life the asset may move anywhere in a large, continuous range from time point to time point, and may experience substantial volatility, so a model only allowing one up and one down move is not very realistic. But, if we simply increase the number of time points within a time interval and allow for an up or down jump at each time point, we can build a risch model of asset price over time.</p>
+<p>Let <span class="math inline">\(\Delta_t\)</span> denote the size of the time step. At time point <span class="math inline">\(i\)</span> the stock takes one of <span class="math inline">\(2^i\)</span> values, and, at time <span class="math inline">\(i+1\)</span>, <span class="math inline">\(2^{i+1}\)</span> values. Suppose we are at time <span class="math inline">\(i\)</span>, and value <span class="math inline">\(S_j^i\)</span> of <span class="math inline">\(2^{i}\)</span>. Then,
+<span class="math display">\[f(S_j^i) = e^{-r\Delta_t}\left\{q_j^if(S_{j,u}^i)+(1-q_j^i)f(S_{j,d}^i)\right\}\]</span>
+where <span class="math inline">\((S_{j,u}^i, S_{j,d}^i)\)</span> are the up and down stock moves from <span class="math inline">\(S_j^i\)</span>, and
+<span class="math display">\[q_j^i = \frac{S_j^i e^{r\Delta_t} - S_{j,d}^i}{S_{j,u}^i-S_{j,d}^i}.\]</span></p>
+<p>Notice that the derivative prices can now be computed recursively from the top of the tree (the end of the time interval) to the bottom (the start of the time interval). For example, consider the following four-period tree of stock prices (with jump probabilities omitted):</p>
+<p><img src="tree_stock.png" alt="Stock Prices">
+Suppose the derivative we are pricing is a European call with strike <span class="math inline">\(95\)</span>. At time 3, from top to bottom, the payoffs are 35, 15, 0, 0, 10, 0, 0, and 0. Suppose <span class="math inline">\(r = 3\%\)</span> and the timestep is <span class="math inline">\(\Delta_t = 1\)</span> for simplicity. Then, at time 2 at node <span class="math inline">\(120\)</span>, we have <span class="math inline">\(q = (120 e^{0.03} - 110)/20 = 0.6827\)</span> and <span class="math inline">\(1-q=0.3173\)</span>. The price of the derivative at node 120 is <span class="math inline">\(e^{-0.03}(0.6827\times 35 + 0.3173 \times 15) = 27.8077\)</span>. The price at the 80 node is 0.</p>
+<p>Similarly, the price of the derivative at the <span class="math inline">\(95\)</span> node is <span class="math inline">\(10e^{-0.03}\cdot q\)</span> where <span class="math inline">\(q = (95 e^{0.03} - 90)/15 = 0.5262\)</span>, yielding a price of <span class="math inline">\(5.1066\)</span>.</p>
+<p>Backtracking to the time 1 nodes, we have derivative prices of 22.50 at node 110 and 4.3959 at node 90. Finally, at time 0 (and node 100) we find the price is 15.72579.</p>
+
+</div>
+</div>
+  <div class="chapter-nav">
+<div class="prev"><a href="intro.html"><span class="header-section-number">2</span> Introduction</a></div>
+<div class="next"><a href="the-geometric-brownian-motion-model-of-asset-value-and-monte-carlo-simulation.html"><span class="header-section-number">4</span> The geometric Brownian motion model of asset value and Monte Carlo simulation</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#the-risk-neutral-framework"><span class="header-section-number">3</span> The risk-neutral framework</a></li>
+<li><a class="nav-link" href="#forwards"><span class="header-section-number">3.1</span> Forwards</a></li>
+<li><a class="nav-link" href="#risk-neutral-pricing-of-derivatives"><span class="header-section-number">3.2</span> Risk-neutral pricing of derivatives</a></li>
+<li><a class="nav-link" href="#binomial-derivative-pricing-model"><span class="header-section-number">3.3</span> Binomial derivative pricing model</a></li>
+</ul>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+          
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>FinancialMathematics</strong>" was written by Nick Syring. It was last built on 2023-02-21.</p>
+  </div>
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
+</script>
+</body>
+</html>
