@@ -1,0 +1,321 @@
+# A flexible derivative pricing model
+
+The model we consider in this section is the Bakshi-Cao- (BCC) model from "Empirical Performance of Alternative Option Pricing Models" in **The Journal of Finance**, Vol. 52, No. 5 (Dec., 1997), pp. 2003-2049.  
+
+The BCC model is characterized by a jump-diffusion model of asset price, with a square-root diffusion process for stochastic volatility, and a Cox-Ingersoll-Ross (CIR) for the stochastic short-term interest rate.  Formally, the model may be expressed as follows:
+\begin{align*}
+dS_t &= (r_t - r_J)S_tdt + \sqrt{v_t}S_tdZ_t^1 + J_tS_tdN_t\\
+dv_t &= \kappa_v(\theta_v - v_t)dt + \sigma_v\sqrt{v_t}dZ_t^2\\
+dr_t &= \kappa_r(\theta_r - r_t)dt + \sigma_r\sqrt{r_t}dZ_t^3.
+\end{align*}
+
+The parameters in the above model have the following meanings:
+\begin{itemize}
+\item[-] $S_t$ is the asset (stock/index) price at time $t$
+\item[-] $r_t$ is the risk-free short term rate at time $t$
+\item[-] $r_J:=\lambda(\exp\{\mu_J + \delta^2/2\}-1)$ is the drift correction for the jump process
+\item[-] $v_t$ is the variance at time $t$
+\item[-] $\kappa_v$ is the speed of adjustment of $v_t$ to its long term average $\theta_t$
+\item[-] $\theta_t$ is long-term average variance, a mean-reversion
+\item[-] $\sigma_v$ is the colatility coefficient of the asset price variance
+\item[-] $Z_t^i$ for $i=1,2,3$ is a Brownian motion with correlations $dZ_t^1dZ_t^2 = \rho dt$ and zero for the other two pairs
+\item[-] $N_t$ is a Poisson jump process with intensity $\lambda$
+\item[-] $J_t$ is a lognormal jump at time $t$, i.e., $\log(1+J_t)\sim N(\log(1+\mu_J)-\delta^2/2, \delta^2)$  
+\item[-] $\kappa_r$ is the speed of adjustment of $r_t$ to its long term average $\theta_r$
+\item[-] $\theta_r$ is long-term average rate, a mean-reversion
+\item[-] $\sigma_r$ is the volatility coefficient of the rate 
+\end{itemize}
+
+This model is inspired by several real-world observations, including the following:
+\begin{itemize}
+\item[*] Asset price volatility implied by the Black-Scholes model (that is, the volatility value solved for given the observed prices) exhibits the following propoerties in real life
+\begin{itemize}
+\item[-] varies over time
+\item[-] negative correlation with returns
+\item[-] varies for different option strike prices
+\item[-] varies for different option maturities
+\end{itemize}
+\item[*] Asset prices/returns exhibit occasional large jumps not modeled well by a Black-Scholes model (geometric Brownian motion) alone
+\item[*] Interest rates do vary over time (e.g., adjustments by Federal Reserve have an impact) and vary for different maturities (there is a term-structure of interest rates)
+\end{itemize}
+
+## Present-value with stochastic short-term rate
+
+Under continuous compounding the present value at time $t$ of a dollar paid at time $T$ is 
+\[B_0(T) = E_t^Q\left(\exp\left\{-\int_t^T r_udu\right\}\right).\]
+An advantage of the CIR model is that the above discounting has a closed-form:
+\begin{align*}
+B_t(T) &= b_1(T)e^{-b_2(T)r_0}\\
+b_1(T) &= \left(\frac{2\gamma \exp((\kappa_r+\gamma)T/2)}{2\gamma + (\kappa_r + \gamma)(e^{\gamma T}-1)}\right)^{\frac{2\kappa_r\theta_r}{\sigma_r^2}}\\
+b_2(T) &= \frac{2(e^{\gamma T}-1)}{2\gamma + (\kappa_r + \gamma)(e^{\gamma T}-1)}\\
+\gamma = \sqrt{\kappa_r^2 + 2\sigma_r^2}
+\end{align*}
+
+The following python codes implement discounting under the CIR model.
+
+```{python}
+import math
+import numpy as np
+
+kappa_r, theta_r, sigma_r, r0, T = 0.3, 0.04, 0.1, 0.04, 1.0
+
+def gamma(kappa_r, sigma_r):
+  ''' Help Function. '''
+  return math.sqrt(kappa_r ** 2 + 2 * sigma_r ** 2)
+
+def b1(alpha):
+  ''' Help Function. '''
+  kappa_r, theta_r, sigma_r, r0, T = alpha
+  g = gamma(kappa_r, sigma_r)
+  return (((2 * g * math.exp((kappa_r + g) * T / 2)) /(2 * g + (kappa_r + g) * (math.exp(g * T) - 1)))** (2 * kappa_r * theta_r / sigma_r ** 2))
+
+
+def b2(alpha):
+  ''' Help Function. '''
+  kappa_r, theta_r, sigma_r, r0, T = alpha
+  g = gamma(kappa_r, sigma_r)
+  return ((2 * (math.exp(g * T) - 1)) /(2 * g + (kappa_r + g) * (math.exp(g * T) - 1)))
+
+def B(alpha):
+  ''' Function to value unit zero-coupon bonds in Cox-Ingersoll-Ross (1985)
+  model.
+  Parameters
+  ==========
+  r0: float
+  initial short rate
+  kappa_r: float
+  mean-reversion factor
+  theta_r: float
+  long-run mean of short rate
+  sigma_r: float
+  volatility of short rate
+  T: float
+  time horizon/interval
+  Returns
+  =======
+  zcb_value: float
+  zero-coupon bond present value
+  '''
+  b_1 = b1(alpha)
+  b_2 = b2(alpha)
+  kappa_r, theta_r, sigma_r, r0, T = alpha
+  return b_1 * math.exp(-b_2 * r0)
+
+if __name__ == '__main__':
+  #
+  # Example Valuation
+  #
+  B0T = B([kappa_r, theta_r, sigma_r, r0, T])
+  # discount factor, ZCB value
+  print("ZCB Value %10.4f" % B0T)
+```
+
+## Evaluating a European option via Fourier transform
+
+```{python}
+import numpy as np
+from scipy.integrate import quad
+import warnings
+warnings.simplefilter('ignore')
+
+#
+# Example Parameters B96 Model
+#
+## H93 Parameters
+kappa_v = 1.5
+theta_v = 0.02
+sigma_v = 0.15
+rho = 0.1
+v0 = 0.01
+## M76 Parameters
+lamb = 0.25
+mu = -0.2
+delta = 0.1
+sigma = np.sqrt(v0)
+## General Parameters
+S0 = 100.0
+K = 100.0
+T = 1.0
+r = 0.05
+
+def BCC_call_value(S0, K, T, r, kappa_v, theta_v, sigma_v, rho, v0, lamb, mu, delta):
+  ''' Valuation of European call option in B96 Model via Lewis (2001)
+  Fourier-based approach.
+  Parameters
+  ==========
+  S0: float
+  initial stock/index level
+  K: float
+  strike price
+  T: float
+  time-to-maturity (for t=0)
+  r: float
+  constant risk-free short rate
+  kappa_v: float
+  mean-reversion factor
+  theta_v: float
+  long-run mean of variance
+  sigma_v: float
+  volatility of variance
+  rho: float
+  correlation between variance and stock/index level
+  v0: float
+  initial level of variance
+  lamb: float
+  jump intensity
+  mu: float
+  expected jump size
+  delta: float
+  standard deviation of jump
+  Returns
+  =======
+  call_value: float
+  present value of European call option
+  '''
+  int_value = quad(lambda u: BCC_int_func(u, S0, K, T, r, kappa_v, theta_v,sigma_v, rho, v0, lamb, mu, delta), 0, np.inf,limit=250)[0]
+  call_value = max(0, S0 - np.exp(-r * T) * np.sqrt(S0 * K)/ np.pi * int_value)
+  return call_value
+
+def H93_call_value(S0, K, T, r, kappa_v, theta_v, sigma_v, rho, v0):
+  ''' Valuation of European call option in H93 model via Lewis (2001)
+  Fourier-based approach.
+  Parameters
+  ==========
+  S0: float
+  initial stock/index level
+  K: float
+  strike price
+  T: float
+  time-to-maturity (for t=0)
+  r: float
+  constant risk-free short rate
+  kappa_v: float
+  mean-reversion factor
+  theta_v: float
+  long-run mean of variance
+  sigma_v: float
+  volatility of variance
+  rho: float
+  correlation between variance and stock/index level
+  v0: float
+  initial level of variance
+  Returns
+  =======
+  call_value: float
+  present value of European call option
+  '''
+  int_value = quad(lambda u: H93_int_func(u, S0, K, T, r, kappa_v, theta_v, sigma_v, rho, v0), 0, np.inf, limit=250)[0]
+  call_value = max(0, S0 - np.exp(-r * T) * np.sqrt(S0 * K)/ np.pi * int_value)
+  return call_value
+
+def M76_call_value(S0, K, T, r, v0, lamb, mu, delta):
+  ''' Valuation of European call option in M76 model via Lewis (2001)
+  Fourier-based approach.
+  Parameters
+  ==========
+  S0: float
+  initial stock/index level
+  K: float
+  strike price
+  T: float
+  time-to-maturity (for t=0)
+  r: float
+  constant risk-free short rate
+  lamb: float
+  jump intensity
+  mu: float
+  expected jump size
+  delta: float
+  standard deviation of jump
+  Returns
+  =======
+  call_value: float
+  present value of European call option
+  '''
+  sigma = np.sqrt(v0)
+  int_value = quad(lambda u: M76_int_func_sa(u, S0, K, T, r,
+  sigma, lamb, mu, delta), 0, np.inf, limit=250)[0]
+  call_value = max(0, S0 - np.exp(-r * T) * np.sqrt(S0 * K)/ np.pi * int_value)
+  return call_value
+
+def BCC_int_func(u, S0, K, T, r, kappa_v, theta_v, sigma_v, rho, v0,lamb, mu, delta):
+  ''' Valuation of European call option in BCC97 model via Lewis (2001)
+  Fourier-based approach: integration function.
+  Parameter definitions see function BCC_call_value.'''
+  char_func_value = BCC_char_func(u - 1j * 0.5, T, r, kappa_v, theta_v, sigma_v, rho, v0, lamb, mu, delta)
+  int_func_value = 1 / (u ** 2 + 0.25) * (np.exp(1j * u * np.log(S0 / K)) * char_func_value).real
+  return int_func_value
+
+def H93_int_func(u, S0, K, T, r, kappa_v, theta_v, sigma_v, rho, v0):
+  ''' Valuation of European call option in H93 model via Lewis (2001)
+  Fourier-based approach: integration function.
+  Parameter definitions see function H93_call_value.'''
+  char_func_value = H93_char_func(u - 1j * 0.5, T, r, kappa_v, theta_v, sigma_v, rho, v0)
+  int_func_value = 1 / (u ** 2 + 0.25) * (np.exp(1j * u * np.log(S0 / K)) * char_func_value).real
+  return int_func_value
+
+
+def M76_int_func_sa(u, S0, K, T, r, sigma, lamb, mu, delta):
+  ''' Valuation of European call option in M76 model via Lewis (2001)
+  Fourier-based approach: integration function.
+  Parameter definitions see function M76_call_value.'''
+  char_func_value = M76_char_func_sa(u - 0.5 * 1j, T, r, sigma, lamb, mu, delta)
+  int_func_value = 1 / (u ** 2 + 0.25) * (np.exp(1j * u * np.log(S0 / K)) * char_func_value).real
+  return int_func_value
+
+def BCC_char_func(u, T, r, kappa_v, theta_v, sigma_v, rho, v0,lamb, mu, delta):
+  ''' Valuation of European call option in BCC97 model via Lewis (2001)
+  Fourier-based approach: characteristic function.
+  Parameter definitions see function BCC_call_value.'''
+  BCC1 = H93_char_func(u, T, r, kappa_v, theta_v, sigma_v, rho, v0)
+  BCC2 = M76_char_func(u, T, lamb, mu, delta)
+  return BCC1 * BCC2
+
+def H93_char_func(u, T, r, kappa_v, theta_v, sigma_v, rho, v0):
+  ''' Valuation of European call option in H93 model via Lewis (2001)
+  Fourier-based approach: characteristic function.
+  Parameter definitions see function BCC_call_value.'''
+  c1 = kappa_v * theta_v
+  c2 = -np.sqrt((rho * sigma_v * u * 1j - kappa_v)** 2 - sigma_v ** 2 * (-u * 1j - u ** 2))
+  c3 = (kappa_v - rho * sigma_v * u * 1j + c2) / (kappa_v - rho * sigma_v * u * 1j - c2)
+  H1 = (r * u * 1j * T + (c1 / sigma_v ** 2)* ((kappa_v - rho * sigma_v * u * 1j + c2) * T- 2 * np.log((1 - c3 * np.exp(c2 * T)) / (1 - c3))))
+  H2 = ((kappa_v - rho * sigma_v * u * 1j + c2) / sigma_v ** 2* ((1 - np.exp(c2 * T)) / (1 - c3 * np.exp(c2 * T))))
+  char_func_value = np.exp(H1 + H2 * v0)
+  return char_func_value
+
+def M76_char_func(u, T, lamb, mu, delta):
+  ''' Valuation of European call option in M76 model via Lewis (2001)
+  Fourier-based approach: characteristic function.
+  Parameter definitions see function M76_call_value.'''
+  omega = -lamb * (np.exp(mu + 0.5 * delta ** 2) - 1)
+  char_func_value = np.exp((1j * u * omega + lamb * (np.exp(1j * u * mu - u ** 2 * delta ** 2 * 0.5) - 1)) * T)
+  return char_func_value
+
+def M76_char_func_sa(u, T, r, sigma, lamb, mu, delta):
+  ''' Valuation of European call option in M76 model via Lewis (2001)
+  Fourier-based approach: characteristic function "jump component".
+  Parameter definitions see function M76_call_value.'''
+  omega = r - 0.5 * sigma ** 2 - lamb * (np.exp(mu + 0.5 * delta ** 2) - 1)
+  char_func_value = np.exp((1j * u * omega - 0.5 * u ** 2 * sigma ** 2+ lamb * (np.exp(1j * u * mu - u ** 2 * delta ** 2 * 0.5)- 1)) * T)
+  return char_func_value
+
+if __name__ == '__main__':
+  #
+  # Example Parameters CIR85 Model
+  #
+  kappa_r, theta_r, sigma_r, r0, T = 0.3, 0.04, 0.1, 0.04, T
+  B0T = B([kappa_r, theta_r, sigma_r, r0, T]) # discount factor
+  r = -np.log(B0T) / T
+  #
+  # Example Values
+  #
+  print("M76 Value %10.4f" % M76_call_value(S0, K, T, r, v0, lamb, mu, delta))
+  print("H93 Value %10.4f" % H93_call_value(S0, K, T, r, kappa_v, theta_v, sigma_v, rho, v0))
+  print("BCC97 Value %10.4f" % BCC_call_value(S0, K, T, r, kappa_v, theta_v,sigma_v, rho, v0, lamb, mu, delta))
+
+
+
+```
+
+
+

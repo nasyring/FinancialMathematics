@@ -7,20 +7,17 @@
 <title>Chapter 4 The geometric Brownian motion model of asset value and Monte Carlo simulation | FinancialMathematics</title>
 <meta name="author" content="Nick Syring">
 <meta name="description" content="4.1 Asset values as random variables Let \(\{S_t, t\geq 0\}\) denote the values of an asset at times \(t\). Ideally, we think of time as a continuum, so that \(S_t\) is a continuous process....">
-<meta name="generator" content="bookdown 0.29 with bs4_book()">
+<meta name="generator" content="bookdown 0.24 with bs4_book()">
 <meta property="og:title" content="Chapter 4 The geometric Brownian motion model of asset value and Monte Carlo simulation | FinancialMathematics">
 <meta property="og:type" content="book">
 <meta property="og:description" content="4.1 Asset values as random variables Let \(\{S_t, t\geq 0\}\) denote the values of an asset at times \(t\). Ideally, we think of time as a continuum, so that \(S_t\) is a continuous process....">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Chapter 4 The geometric Brownian motion model of asset value and Monte Carlo simulation | FinancialMathematics">
 <meta name="twitter:description" content="4.1 Asset values as random variables Let \(\{S_t, t\geq 0\}\) denote the values of an asset at times \(t\). Ideally, we think of time as a continuum, so that \(S_t\) is a continuous process....">
-<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/header-attrs-2.11/header-attrs.js"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
-<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.4.0/transition.js"></script><script src="libs/bs3compat-0.4.0/tabs.js"></script><script src="libs/bs3compat-0.4.0/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
-<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
-    
-    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-  </style>
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.3.1/transition.js"></script><script src="libs/bs3compat-0.3.1/tabs.js"></script><script src="libs/bs3compat-0.3.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS -->
 </head>
 <body data-spy="scroll" data-target="#toc">
 
@@ -46,6 +43,7 @@
 <li><a class="" href="intro.html"><span class="header-section-number">2</span> Introduction</a></li>
 <li><a class="" href="the-risk-neutral-framework.html"><span class="header-section-number">3</span> The risk-neutral framework</a></li>
 <li><a class="active" href="the-geometric-brownian-motion-model-of-asset-value-and-monte-carlo-simulation.html"><span class="header-section-number">4</span> The geometric Brownian motion model of asset value and Monte Carlo simulation</a></li>
+<li><a class="" href="a-flexible-derivative-pricing-model.html"><span class="header-section-number">5</span> A flexible derivative pricing model</a></li>
 </ul>
 
         <div class="book-extra">
@@ -217,10 +215,10 @@ a scaled log-normal. This is helpful, e.g., for comparing the exact distribution
 <pre><code>##      statistic     data set 1     data set 2     data set 3
 ## ---------------------------------------------
 ##           size             NA      10000.000      10000.000
-##            min             NA         29.106         22.336
-##            max             NA        340.906        371.492
-##           mean        110.517        109.804        109.838
-##          stdev         40.327         39.456         39.418</code></pre>
+##            min             NA         28.097         27.338
+##            max             NA        390.870        448.195
+##           mean        110.517        110.759        110.511
+##          stdev         40.327         40.583         40.726</code></pre>
 <p>The simplest way to reduce MC variability (besides increasing the number of samples) is to use <em>anti-thetical variates</em>. When sampling standard normal random variates this amounts to sampling <span class="math inline">\(z\)</span> and using both <span class="math inline">\((z,-z)\)</span> as samples. To get <span class="math inline">\(2I\)</span> samples one only needs to actually compute <span class="math inline">\(I\)</span> samples, the remaining <span class="math inline">\(I\)</span> are the same in magnitude but with the opposite signs. This accomplishes exact mean-matching, i.e., <span class="math inline">\((2I)^{-1}\sum_{i=1}^{2I} z_i = 0\)</span>, exactly the standard normal distribution mean. <br></p>
 <p>Another method for reducing MC variability is second-moment matching. Suppose we generate antithetical samples <span class="math inline">\(z = (z_1, \ldots, z_I)\)</span>. Let <span class="math inline">\(z^\star_i := z_i / s_{z}\)</span> for <span class="math inline">\(i=1, \ldots, I\)</span> where <span class="math inline">\(s_z\)</span> is the sample standard deviation of <span class="math inline">\(z\)</span>. Now, <span class="math inline">\(z^\star\)</span> has sample mean exactly zero and sample standard deviation exactly <span class="math inline">\(1\)</span>. <br></p>
 <p>Further, a Box-Cox transformation may be used if the samples <span class="math inline">\(z\)</span> have positive skew. (If they have negative skew, then the samples may be reflected about the maximum value to produce a set of positively-skewed values starting from zero.) After applying the Box-cox transformation, the resulting values <span class="math inline">\(y\)</span> should be close to symmetric (closer to a normal distribution than the original variates) and a further standardization <span class="math inline">\(z^\star_i = (y_i - \overline y)/s_y\)</span> may be used to transform the values to approximately standard normal.</p>
@@ -287,20 +285,20 @@ a scaled log-normal. This is helpful, e.g., for comparing the exact distribution
 <span id="cb13-60"><a href="the-geometric-brownian-motion-model-of-asset-value-and-monte-carlo-simulation.html#cb13-60" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb13-61"><a href="the-geometric-brownian-motion-model-of-asset-value-and-monte-carlo-simulation.html#cb13-61" aria-hidden="true" tabindex="-1"></a>print_stats2()  </span></code></pre></div>
 <pre><code>##      statistic     data set 1     data set 2     data set 3     data set 4     data set 5     data set 6     data set 7     data set 8
-##      mean mean         -0.000         -0.000          0.000          0.000         -0.000         -0.000          0.000         -0.000
+##      mean mean          0.000         -0.000         -0.000          0.000         -0.000          0.000         -0.000          0.000
 ##       std mean          0.010          0.010          0.000          0.000          0.000          0.000          0.000          0.000
-##       mean std          1.000          0.999          0.999          1.000          1.000          1.000          1.000          1.000
-##        std std          0.014          0.013          0.020          0.020          0.000          0.000          0.000          0.000
-##  mean kurtosis          0.001          0.000         -0.000          0.000         -0.010         -0.011         -0.000          0.000
-##   std kurtosis          0.024          0.024          0.000          0.000          0.007          0.007          0.000          0.000
-##      mean skew         -0.002         -0.001          0.001         -0.005          0.006          0.000          0.001         -0.005
-##       std skew          0.049          0.050          0.069          0.072          0.066          0.069          0.069          0.072</code></pre>
+##       mean std          0.998          1.000          1.001          1.000          1.000          1.000          1.000          1.000
+##        std std          0.014          0.014          0.020          0.020          0.000          0.000          0.000          0.000
+##  mean kurtosis         -0.000         -0.001         -0.000         -0.000         -0.010         -0.010         -0.000          0.000
+##   std kurtosis          0.025          0.023          0.000          0.000          0.006          0.007          0.000          0.000
+##      mean skew         -0.001         -0.001         -0.002         -0.002          0.002          0.003         -0.002         -0.002
+##       std skew          0.048          0.047          0.066          0.069          0.063          0.067          0.066          0.069</code></pre>
 
 </div>
 </div>
   <div class="chapter-nav">
 <div class="prev"><a href="the-risk-neutral-framework.html"><span class="header-section-number">3</span> The risk-neutral framework</a></div>
-<div class="empty"></div>
+<div class="next"><a href="a-flexible-derivative-pricing-model.html"><span class="header-section-number">5</span> A flexible derivative pricing model</a></div>
 </div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
     <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
       <ul class="nav navbar-nav">
@@ -325,7 +323,7 @@ a scaled log-normal. This is helpful, e.g., for comparing the exact distribution
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>FinancialMathematics</strong>" was written by Nick Syring. It was last built on 2023-02-21.</p>
+    <p>"<strong>FinancialMathematics</strong>" was written by Nick Syring. It was last built on 2023-02-22.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
@@ -338,7 +336,7 @@ a scaled log-normal. This is helpful, e.g., for comparing the exact distribution
     var script = document.createElement("script");
     script.type = "text/javascript";
     var src = "true";
-    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:")
       if (/^https?:/.test(src))
         src = src.replace(/^https?:/, '');

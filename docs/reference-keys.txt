@@ -9,3 +9,6 @@ asset-values-as-random-variables
 geometric-brownian-motion-model-of-asset-prices-over-time
 monte-carlo-simulation-of-the-gbm-model
 off-on-a-tangent-reducing-mc-variability
+a-flexible-derivative-pricing-model
+present-value-with-stochastic-short-term-rate
+evaluating-a-european-option-via-fourier-transform

@@ -124,7 +124,7 @@
 
 \title{FinancialMathematics}
 \author{Nick Syring}
-\date{2023-02-21}
+\date{2023-02-22}
 
 \begin{document}
 \maketitle
@@ -417,10 +417,10 @@ The difference between the theoretic (exact) values for the mean and standard de
 ##      statistic     data set 1     data set 2     data set 3
 ## ---------------------------------------------
 ##           size             NA      10000.000      10000.000
-##            min             NA         29.025         26.878
-##            max             NA        396.629        370.469
-##           mean        110.517        109.941        110.583
-##          stdev         40.327         40.036         39.934
+##            min             NA         27.282         24.947
+##            max             NA        402.374        390.602
+##           mean        110.517        110.065        110.384
+##          stdev         40.327         40.454         39.955
 \end{verbatim}
 
 The simplest way to reduce MC variability (besides increasing the number of samples) is to use \emph{anti-thetical variates}. When sampling standard normal random variates this amounts to sampling \(z\) and using both \((z,-z)\) as samples. To get \(2I\) samples one only needs to actually compute \(I\) samples, the remaining \(I\) are the same in magnitude but with the opposite signs. This accomplishes exact mean-matching, i.e., \((2I)^{-1}\sum_{i=1}^{2I} z_i = 0\), exactly the standard normal distribution mean.
@@ -499,14 +499,349 @@ The following simulation supports the use of standardized antithetic variates. B
 
 \begin{verbatim}
 ##      statistic     data set 1     data set 2     data set 3     data set 4     data set 5     data set 6     data set 7     data set 8
-##      mean mean          0.000         -0.000          0.000         -0.000          0.000         -0.000         -0.000          0.000
-##       std mean          0.010          0.010          0.000          0.000          0.000          0.000          0.000          0.000
-##       mean std          1.000          1.000          1.000          0.999          1.000          1.000          1.000          1.000
-##        std std          0.014          0.014          0.020          0.019          0.000          0.000          0.000          0.000
-##  mean kurtosis         -0.001         -0.001          0.000         -0.000         -0.011         -0.010          0.000          0.000
-##   std kurtosis          0.025          0.024          0.000          0.000          0.007          0.007          0.000          0.000
-##      mean skew         -0.002         -0.004         -0.005         -0.003         -0.001          0.002         -0.005         -0.003
-##       std skew          0.048          0.049          0.069          0.068          0.066          0.065          0.069          0.068
+##      mean mean          0.000         -0.000          0.000         -0.000          0.000         -0.000         -0.000         -0.000
+##       std mean          0.009          0.010          0.000          0.000          0.000          0.000          0.000          0.000
+##       mean std          1.000          0.999          1.000          0.999          1.000          1.000          1.000          1.000
+##        std std          0.014          0.014          0.020          0.020          0.000          0.000          0.000          0.000
+##  mean kurtosis         -0.001          0.001          0.000          0.000         -0.010         -0.010          0.000          0.000
+##   std kurtosis          0.024          0.024          0.000          0.000          0.006          0.007          0.000          0.000
+##      mean skew         -0.001          0.001          0.001         -0.001          0.005          0.004          0.001         -0.001
+##       std skew          0.048          0.049          0.068          0.070          0.065          0.067          0.068          0.070
+\end{verbatim}
+
+\hypertarget{a-flexible-derivative-pricing-model}{%
+\chapter{A flexible derivative pricing model}\label{a-flexible-derivative-pricing-model}}
+
+The model we consider in this section is the Bakshi-Cao- (BCC) model from ``Empirical Performance of Alternative Option Pricing Models'' in \textbf{The Journal of Finance}, Vol. 52, No.~5 (Dec., 1997), pp.~2003-2049.
+
+The BCC model is characterized by a jump-diffusion model of asset price, with a square-root diffusion process for stochastic volatility, and a Cox-Ingersoll-Ross (CIR) for the stochastic short-term interest rate. Formally, the model may be expressed as follows:
+\begin{align*}
+dS_t &= (r_t - r_J)S_tdt + \sqrt{v_t}S_tdZ_t^1 + J_tS_tdN_t\\
+dv_t &= \kappa_v(\theta_v - v_t)dt + \sigma_v\sqrt{v_t}dZ_t^2\\
+dr_t &= \kappa_r(\theta_r - r_t)dt + \sigma_r\sqrt{r_t}dZ_t^3.
+\end{align*}
+
+The parameters in the above model have the following meanings:
+
+\begin{itemize}
+\item[-] $S_t$ is the asset (stock/index) price at time $t$
+\item[-] $r_t$ is the risk-free short term rate at time $t$
+\item[-] $r_J:=\lambda(\exp\{\mu_J + \delta^2/2\}-1)$ is the drift correction for the jump process
+\item[-] $v_t$ is the variance at time $t$
+\item[-] $\kappa_v$ is the speed of adjustment of $v_t$ to its long term average $\theta_t$
+\item[-] $\theta_t$ is long-term average variance, a mean-reversion
+\item[-] $\sigma_v$ is the colatility coefficient of the asset price variance
+\item[-] $Z_t^i$ for $i=1,2,3$ is a Brownian motion with correlations $dZ_t^1dZ_t^2 = \rho dt$ and zero for the other two pairs
+\item[-] $N_t$ is a Poisson jump process with intensity $\lambda$
+\item[-] $J_t$ is a lognormal jump at time $t$, i.e., $\log(1+J_t)\sim N(\log(1+\mu_J)-\delta^2/2, \delta^2)$  
+\item[-] $\kappa_r$ is the speed of adjustment of $r_t$ to its long term average $\theta_r$
+\item[-] $\theta_r$ is long-term average rate, a mean-reversion
+\item[-] $\sigma_r$ is the volatility coefficient of the rate 
+\end{itemize}
+
+This model is inspired by several real-world observations, including the following:
+
+\begin{itemize}
+\item[*] Asset price volatility implied by the Black-Scholes model (that is, the volatility value solved for given the observed prices) exhibits the following propoerties in real life
+\begin{itemize}
+\item[-] varies over time
+\item[-] negative correlation with returns
+\item[-] varies for different option strike prices
+\item[-] varies for different option maturities
+\end{itemize}
+\item[*] Asset prices/returns exhibit occasional large jumps not modeled well by a Black-Scholes model (geometric Brownian motion) alone
+\item[*] Interest rates do vary over time (e.g., adjustments by Federal Reserve have an impact) and vary for different maturities (there is a term-structure of interest rates)
+\end{itemize}
+
+\hypertarget{present-value-with-stochastic-short-term-rate}{%
+\section{Present-value with stochastic short-term rate}\label{present-value-with-stochastic-short-term-rate}}
+
+Under continuous compounding the present value at time \(t\) of a dollar paid at time \(T\) is
+\[B_0(T) = E_t^Q\left(\exp\left\{-\int_t^T r_udu\right\}\right).\]
+An advantage of the CIR model is that the above discounting has a closed-form:
+\begin{align*}
+B_t(T) &= b_1(T)e^{-b_2(T)r_0}\\
+b_1(T) &= \left(\frac{2\gamma \exp((\kappa_r+\gamma)T/2)}{2\gamma + (\kappa_r + \gamma)(e^{\gamma T}-1)}\right)^{\frac{2\kappa_r\theta_r}{\sigma_r^2}}\\
+b_2(T) &= \frac{2(e^{\gamma T}-1)}{2\gamma + (\kappa_r + \gamma)(e^{\gamma T}-1)}\\
+\gamma = \sqrt{\kappa_r^2 + 2\sigma_r^2}
+\end{align*}
+
+The following python codes implement discounting under the CIR model.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ math}
+\ImportTok{import}\NormalTok{ numpy }\ImportTok{as}\NormalTok{ np}
+
+\NormalTok{kappa\_r, theta\_r, sigma\_r, r0, T }\OperatorTok{=} \FloatTok{0.3}\NormalTok{, }\FloatTok{0.04}\NormalTok{, }\FloatTok{0.1}\NormalTok{, }\FloatTok{0.04}\NormalTok{, }\FloatTok{1.0}
+
+\KeywordTok{def}\NormalTok{ gamma(kappa\_r, sigma\_r):}
+  \CommentTok{\textquotesingle{}\textquotesingle{}\textquotesingle{} Help Function. \textquotesingle{}\textquotesingle{}\textquotesingle{}}
+  \ControlFlowTok{return}\NormalTok{ math.sqrt(kappa\_r }\OperatorTok{**} \DecValTok{2} \OperatorTok{+} \DecValTok{2} \OperatorTok{*}\NormalTok{ sigma\_r }\OperatorTok{**} \DecValTok{2}\NormalTok{)}
+
+\KeywordTok{def}\NormalTok{ b1(alpha):}
+  \CommentTok{\textquotesingle{}\textquotesingle{}\textquotesingle{} Help Function. \textquotesingle{}\textquotesingle{}\textquotesingle{}}
+\NormalTok{  kappa\_r, theta\_r, sigma\_r, r0, T }\OperatorTok{=}\NormalTok{ alpha}
+\NormalTok{  g }\OperatorTok{=}\NormalTok{ gamma(kappa\_r, sigma\_r)}
+  \ControlFlowTok{return}\NormalTok{ (((}\DecValTok{2} \OperatorTok{*}\NormalTok{ g }\OperatorTok{*}\NormalTok{ math.exp((kappa\_r }\OperatorTok{+}\NormalTok{ g) }\OperatorTok{*}\NormalTok{ T }\OperatorTok{/} \DecValTok{2}\NormalTok{)) }\OperatorTok{/}\NormalTok{(}\DecValTok{2} \OperatorTok{*}\NormalTok{ g }\OperatorTok{+}\NormalTok{ (kappa\_r }\OperatorTok{+}\NormalTok{ g) }\OperatorTok{*}\NormalTok{ (math.exp(g }\OperatorTok{*}\NormalTok{ T) }\OperatorTok{{-}} \DecValTok{1}\NormalTok{)))}\OperatorTok{**}\NormalTok{ (}\DecValTok{2} \OperatorTok{*}\NormalTok{ kappa\_r }\OperatorTok{*}\NormalTok{ theta\_r }\OperatorTok{/}\NormalTok{ sigma\_r }\OperatorTok{**} \DecValTok{2}\NormalTok{))}
+
+
+\KeywordTok{def}\NormalTok{ b2(alpha):}
+  \CommentTok{\textquotesingle{}\textquotesingle{}\textquotesingle{} Help Function. \textquotesingle{}\textquotesingle{}\textquotesingle{}}
+\NormalTok{  kappa\_r, theta\_r, sigma\_r, r0, T }\OperatorTok{=}\NormalTok{ alpha}
+\NormalTok{  g }\OperatorTok{=}\NormalTok{ gamma(kappa\_r, sigma\_r)}
+  \ControlFlowTok{return}\NormalTok{ ((}\DecValTok{2} \OperatorTok{*}\NormalTok{ (math.exp(g }\OperatorTok{*}\NormalTok{ T) }\OperatorTok{{-}} \DecValTok{1}\NormalTok{)) }\OperatorTok{/}\NormalTok{(}\DecValTok{2} \OperatorTok{*}\NormalTok{ g }\OperatorTok{+}\NormalTok{ (kappa\_r }\OperatorTok{+}\NormalTok{ g) }\OperatorTok{*}\NormalTok{ (math.exp(g }\OperatorTok{*}\NormalTok{ T) }\OperatorTok{{-}} \DecValTok{1}\NormalTok{)))}
+
+\KeywordTok{def}\NormalTok{ B(alpha):}
+  \CommentTok{\textquotesingle{}\textquotesingle{}\textquotesingle{} Function to value unit zero{-}coupon bonds in Cox{-}Ingersoll{-}Ross (1985)}
+\CommentTok{  model.}
+\CommentTok{  Parameters}
+\CommentTok{  ==========}
+\CommentTok{  r0: float}
+\CommentTok{  initial short rate}
+\CommentTok{  kappa\_r: float}
+\CommentTok{  mean{-}reversion factor}
+\CommentTok{  theta\_r: float}
+\CommentTok{  long{-}run mean of short rate}
+\CommentTok{  sigma\_r: float}
+\CommentTok{  volatility of short rate}
+\CommentTok{  T: float}
+\CommentTok{  time horizon/interval}
+\CommentTok{  Returns}
+\CommentTok{  =======}
+\CommentTok{  zcb\_value: float}
+\CommentTok{  zero{-}coupon bond present value}
+\CommentTok{  \textquotesingle{}\textquotesingle{}\textquotesingle{}}
+\NormalTok{  b\_1 }\OperatorTok{=}\NormalTok{ b1(alpha)}
+\NormalTok{  b\_2 }\OperatorTok{=}\NormalTok{ b2(alpha)}
+\NormalTok{  kappa\_r, theta\_r, sigma\_r, r0, T }\OperatorTok{=}\NormalTok{ alpha}
+  \ControlFlowTok{return}\NormalTok{ b\_1 }\OperatorTok{*}\NormalTok{ math.exp(}\OperatorTok{{-}}\NormalTok{b\_2 }\OperatorTok{*}\NormalTok{ r0)}
+
+\ControlFlowTok{if} \VariableTok{\_\_name\_\_} \OperatorTok{==} \StringTok{\textquotesingle{}\_\_main\_\_\textquotesingle{}}\NormalTok{:}
+  \CommentTok{\#}
+  \CommentTok{\# Example Valuation}
+  \CommentTok{\#}
+\NormalTok{  B0T }\OperatorTok{=}\NormalTok{ B([kappa\_r, theta\_r, sigma\_r, r0, T])}
+  \CommentTok{\# discount factor, ZCB value}
+  \BuiltInTok{print}\NormalTok{(}\StringTok{"ZCB Value }\SpecialCharTok{\%10.4f}\StringTok{"} \OperatorTok{\%}\NormalTok{ B0T)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## ZCB Value     0.9608
+\end{verbatim}
+
+\hypertarget{evaluating-a-european-option-via-fourier-transform}{%
+\section{Evaluating a European option via Fourier transform}\label{evaluating-a-european-option-via-fourier-transform}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ numpy }\ImportTok{as}\NormalTok{ np}
+\ImportTok{from}\NormalTok{ scipy.integrate }\ImportTok{import}\NormalTok{ quad}
+\ImportTok{import}\NormalTok{ warnings}
+\NormalTok{warnings.simplefilter(}\StringTok{\textquotesingle{}ignore\textquotesingle{}}\NormalTok{)}
+
+\CommentTok{\#}
+\CommentTok{\# Example Parameters B96 Model}
+\CommentTok{\#}
+\CommentTok{\#\# H93 Parameters}
+\NormalTok{kappa\_v }\OperatorTok{=} \FloatTok{1.5}
+\NormalTok{theta\_v }\OperatorTok{=} \FloatTok{0.02}
+\NormalTok{sigma\_v }\OperatorTok{=} \FloatTok{0.15}
+\NormalTok{rho }\OperatorTok{=} \FloatTok{0.1}
+\NormalTok{v0 }\OperatorTok{=} \FloatTok{0.01}
+\CommentTok{\#\# M76 Parameters}
+\NormalTok{lamb }\OperatorTok{=} \FloatTok{0.25}
+\NormalTok{mu }\OperatorTok{=} \OperatorTok{{-}}\FloatTok{0.2}
+\NormalTok{delta }\OperatorTok{=} \FloatTok{0.1}
+\NormalTok{sigma }\OperatorTok{=}\NormalTok{ np.sqrt(v0)}
+\CommentTok{\#\# General Parameters}
+\NormalTok{S0 }\OperatorTok{=} \FloatTok{100.0}
+\NormalTok{K }\OperatorTok{=} \FloatTok{100.0}
+\NormalTok{T }\OperatorTok{=} \FloatTok{1.0}
+\NormalTok{r }\OperatorTok{=} \FloatTok{0.05}
+
+\KeywordTok{def}\NormalTok{ BCC\_call\_value(S0, K, T, r, kappa\_v, theta\_v, sigma\_v, rho, v0, lamb, mu, delta):}
+  \CommentTok{\textquotesingle{}\textquotesingle{}\textquotesingle{} Valuation of European call option in B96 Model via Lewis (2001)}
+\CommentTok{  Fourier{-}based approach.}
+\CommentTok{  Parameters}
+\CommentTok{  ==========}
+\CommentTok{  S0: float}
+\CommentTok{  initial stock/index level}
+\CommentTok{  K: float}
+\CommentTok{  strike price}
+\CommentTok{  T: float}
+\CommentTok{  time{-}to{-}maturity (for t=0)}
+\CommentTok{  r: float}
+\CommentTok{  constant risk{-}free short rate}
+\CommentTok{  kappa\_v: float}
+\CommentTok{  mean{-}reversion factor}
+\CommentTok{  theta\_v: float}
+\CommentTok{  long{-}run mean of variance}
+\CommentTok{  sigma\_v: float}
+\CommentTok{  volatility of variance}
+\CommentTok{  rho: float}
+\CommentTok{  correlation between variance and stock/index level}
+\CommentTok{  v0: float}
+\CommentTok{  initial level of variance}
+\CommentTok{  lamb: float}
+\CommentTok{  jump intensity}
+\CommentTok{  mu: float}
+\CommentTok{  expected jump size}
+\CommentTok{  delta: float}
+\CommentTok{  standard deviation of jump}
+\CommentTok{  Returns}
+\CommentTok{  =======}
+\CommentTok{  call\_value: float}
+\CommentTok{  present value of European call option}
+\CommentTok{  \textquotesingle{}\textquotesingle{}\textquotesingle{}}
+\NormalTok{  int\_value }\OperatorTok{=}\NormalTok{ quad(}\KeywordTok{lambda}\NormalTok{ u: BCC\_int\_func(u, S0, K, T, r, kappa\_v, theta\_v,sigma\_v, rho, v0, lamb, mu, delta), }\DecValTok{0}\NormalTok{, np.inf,limit}\OperatorTok{=}\DecValTok{250}\NormalTok{)[}\DecValTok{0}\NormalTok{]}
+\NormalTok{  call\_value }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(}\DecValTok{0}\NormalTok{, S0 }\OperatorTok{{-}}\NormalTok{ np.exp(}\OperatorTok{{-}}\NormalTok{r }\OperatorTok{*}\NormalTok{ T) }\OperatorTok{*}\NormalTok{ np.sqrt(S0 }\OperatorTok{*}\NormalTok{ K)}\OperatorTok{/}\NormalTok{ np.pi }\OperatorTok{*}\NormalTok{ int\_value)}
+  \ControlFlowTok{return}\NormalTok{ call\_value}
+
+\KeywordTok{def}\NormalTok{ H93\_call\_value(S0, K, T, r, kappa\_v, theta\_v, sigma\_v, rho, v0):}
+  \CommentTok{\textquotesingle{}\textquotesingle{}\textquotesingle{} Valuation of European call option in H93 model via Lewis (2001)}
+\CommentTok{  Fourier{-}based approach.}
+\CommentTok{  Parameters}
+\CommentTok{  ==========}
+\CommentTok{  S0: float}
+\CommentTok{  initial stock/index level}
+\CommentTok{  K: float}
+\CommentTok{  strike price}
+\CommentTok{  T: float}
+\CommentTok{  time{-}to{-}maturity (for t=0)}
+\CommentTok{  r: float}
+\CommentTok{  constant risk{-}free short rate}
+\CommentTok{  kappa\_v: float}
+\CommentTok{  mean{-}reversion factor}
+\CommentTok{  theta\_v: float}
+\CommentTok{  long{-}run mean of variance}
+\CommentTok{  sigma\_v: float}
+\CommentTok{  volatility of variance}
+\CommentTok{  rho: float}
+\CommentTok{  correlation between variance and stock/index level}
+\CommentTok{  v0: float}
+\CommentTok{  initial level of variance}
+\CommentTok{  Returns}
+\CommentTok{  =======}
+\CommentTok{  call\_value: float}
+\CommentTok{  present value of European call option}
+\CommentTok{  \textquotesingle{}\textquotesingle{}\textquotesingle{}}
+\NormalTok{  int\_value }\OperatorTok{=}\NormalTok{ quad(}\KeywordTok{lambda}\NormalTok{ u: H93\_int\_func(u, S0, K, T, r, kappa\_v, theta\_v, sigma\_v, rho, v0), }\DecValTok{0}\NormalTok{, np.inf, limit}\OperatorTok{=}\DecValTok{250}\NormalTok{)[}\DecValTok{0}\NormalTok{]}
+\NormalTok{  call\_value }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(}\DecValTok{0}\NormalTok{, S0 }\OperatorTok{{-}}\NormalTok{ np.exp(}\OperatorTok{{-}}\NormalTok{r }\OperatorTok{*}\NormalTok{ T) }\OperatorTok{*}\NormalTok{ np.sqrt(S0 }\OperatorTok{*}\NormalTok{ K)}\OperatorTok{/}\NormalTok{ np.pi }\OperatorTok{*}\NormalTok{ int\_value)}
+  \ControlFlowTok{return}\NormalTok{ call\_value}
+
+\KeywordTok{def}\NormalTok{ M76\_call\_value(S0, K, T, r, v0, lamb, mu, delta):}
+  \CommentTok{\textquotesingle{}\textquotesingle{}\textquotesingle{} Valuation of European call option in M76 model via Lewis (2001)}
+\CommentTok{  Fourier{-}based approach.}
+\CommentTok{  Parameters}
+\CommentTok{  ==========}
+\CommentTok{  S0: float}
+\CommentTok{  initial stock/index level}
+\CommentTok{  K: float}
+\CommentTok{  strike price}
+\CommentTok{  T: float}
+\CommentTok{  time{-}to{-}maturity (for t=0)}
+\CommentTok{  r: float}
+\CommentTok{  constant risk{-}free short rate}
+\CommentTok{  lamb: float}
+\CommentTok{  jump intensity}
+\CommentTok{  mu: float}
+\CommentTok{  expected jump size}
+\CommentTok{  delta: float}
+\CommentTok{  standard deviation of jump}
+\CommentTok{  Returns}
+\CommentTok{  =======}
+\CommentTok{  call\_value: float}
+\CommentTok{  present value of European call option}
+\CommentTok{  \textquotesingle{}\textquotesingle{}\textquotesingle{}}
+\NormalTok{  sigma }\OperatorTok{=}\NormalTok{ np.sqrt(v0)}
+\NormalTok{  int\_value }\OperatorTok{=}\NormalTok{ quad(}\KeywordTok{lambda}\NormalTok{ u: M76\_int\_func\_sa(u, S0, K, T, r,}
+\NormalTok{  sigma, lamb, mu, delta), }\DecValTok{0}\NormalTok{, np.inf, limit}\OperatorTok{=}\DecValTok{250}\NormalTok{)[}\DecValTok{0}\NormalTok{]}
+\NormalTok{  call\_value }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(}\DecValTok{0}\NormalTok{, S0 }\OperatorTok{{-}}\NormalTok{ np.exp(}\OperatorTok{{-}}\NormalTok{r }\OperatorTok{*}\NormalTok{ T) }\OperatorTok{*}\NormalTok{ np.sqrt(S0 }\OperatorTok{*}\NormalTok{ K)}\OperatorTok{/}\NormalTok{ np.pi }\OperatorTok{*}\NormalTok{ int\_value)}
+  \ControlFlowTok{return}\NormalTok{ call\_value}
+
+\KeywordTok{def}\NormalTok{ BCC\_int\_func(u, S0, K, T, r, kappa\_v, theta\_v, sigma\_v, rho, v0,lamb, mu, delta):}
+  \CommentTok{\textquotesingle{}\textquotesingle{}\textquotesingle{} Valuation of European call option in BCC97 model via Lewis (2001)}
+\CommentTok{  Fourier{-}based approach: integration function.}
+\CommentTok{  Parameter definitions see function BCC\_call\_value.\textquotesingle{}\textquotesingle{}\textquotesingle{}}
+\NormalTok{  char\_func\_value }\OperatorTok{=}\NormalTok{ BCC\_char\_func(u }\OperatorTok{{-}} \OtherTok{1j} \OperatorTok{*} \FloatTok{0.5}\NormalTok{, T, r, kappa\_v, theta\_v, sigma\_v, rho, v0, lamb, mu, delta)}
+\NormalTok{  int\_func\_value }\OperatorTok{=} \DecValTok{1} \OperatorTok{/}\NormalTok{ (u }\OperatorTok{**} \DecValTok{2} \OperatorTok{+} \FloatTok{0.25}\NormalTok{) }\OperatorTok{*}\NormalTok{ (np.exp(}\OtherTok{1j} \OperatorTok{*}\NormalTok{ u }\OperatorTok{*}\NormalTok{ np.log(S0 }\OperatorTok{/}\NormalTok{ K)) }\OperatorTok{*}\NormalTok{ char\_func\_value).real}
+  \ControlFlowTok{return}\NormalTok{ int\_func\_value}
+
+\KeywordTok{def}\NormalTok{ H93\_int\_func(u, S0, K, T, r, kappa\_v, theta\_v, sigma\_v, rho, v0):}
+  \CommentTok{\textquotesingle{}\textquotesingle{}\textquotesingle{} Valuation of European call option in H93 model via Lewis (2001)}
+\CommentTok{  Fourier{-}based approach: integration function.}
+\CommentTok{  Parameter definitions see function H93\_call\_value.\textquotesingle{}\textquotesingle{}\textquotesingle{}}
+\NormalTok{  char\_func\_value }\OperatorTok{=}\NormalTok{ H93\_char\_func(u }\OperatorTok{{-}} \OtherTok{1j} \OperatorTok{*} \FloatTok{0.5}\NormalTok{, T, r, kappa\_v, theta\_v, sigma\_v, rho, v0)}
+\NormalTok{  int\_func\_value }\OperatorTok{=} \DecValTok{1} \OperatorTok{/}\NormalTok{ (u }\OperatorTok{**} \DecValTok{2} \OperatorTok{+} \FloatTok{0.25}\NormalTok{) }\OperatorTok{*}\NormalTok{ (np.exp(}\OtherTok{1j} \OperatorTok{*}\NormalTok{ u }\OperatorTok{*}\NormalTok{ np.log(S0 }\OperatorTok{/}\NormalTok{ K)) }\OperatorTok{*}\NormalTok{ char\_func\_value).real}
+  \ControlFlowTok{return}\NormalTok{ int\_func\_value}
+
+
+\KeywordTok{def}\NormalTok{ M76\_int\_func\_sa(u, S0, K, T, r, sigma, lamb, mu, delta):}
+  \CommentTok{\textquotesingle{}\textquotesingle{}\textquotesingle{} Valuation of European call option in M76 model via Lewis (2001)}
+\CommentTok{  Fourier{-}based approach: integration function.}
+\CommentTok{  Parameter definitions see function M76\_call\_value.\textquotesingle{}\textquotesingle{}\textquotesingle{}}
+\NormalTok{  char\_func\_value }\OperatorTok{=}\NormalTok{ M76\_char\_func\_sa(u }\OperatorTok{{-}} \FloatTok{0.5} \OperatorTok{*} \OtherTok{1j}\NormalTok{, T, r, sigma, lamb, mu, delta)}
+\NormalTok{  int\_func\_value }\OperatorTok{=} \DecValTok{1} \OperatorTok{/}\NormalTok{ (u }\OperatorTok{**} \DecValTok{2} \OperatorTok{+} \FloatTok{0.25}\NormalTok{) }\OperatorTok{*}\NormalTok{ (np.exp(}\OtherTok{1j} \OperatorTok{*}\NormalTok{ u }\OperatorTok{*}\NormalTok{ np.log(S0 }\OperatorTok{/}\NormalTok{ K)) }\OperatorTok{*}\NormalTok{ char\_func\_value).real}
+  \ControlFlowTok{return}\NormalTok{ int\_func\_value}
+
+\KeywordTok{def}\NormalTok{ BCC\_char\_func(u, T, r, kappa\_v, theta\_v, sigma\_v, rho, v0,lamb, mu, delta):}
+  \CommentTok{\textquotesingle{}\textquotesingle{}\textquotesingle{} Valuation of European call option in BCC97 model via Lewis (2001)}
+\CommentTok{  Fourier{-}based approach: characteristic function.}
+\CommentTok{  Parameter definitions see function BCC\_call\_value.\textquotesingle{}\textquotesingle{}\textquotesingle{}}
+\NormalTok{  BCC1 }\OperatorTok{=}\NormalTok{ H93\_char\_func(u, T, r, kappa\_v, theta\_v, sigma\_v, rho, v0)}
+\NormalTok{  BCC2 }\OperatorTok{=}\NormalTok{ M76\_char\_func(u, T, lamb, mu, delta)}
+  \ControlFlowTok{return}\NormalTok{ BCC1 }\OperatorTok{*}\NormalTok{ BCC2}
+
+\KeywordTok{def}\NormalTok{ H93\_char\_func(u, T, r, kappa\_v, theta\_v, sigma\_v, rho, v0):}
+  \CommentTok{\textquotesingle{}\textquotesingle{}\textquotesingle{} Valuation of European call option in H93 model via Lewis (2001)}
+\CommentTok{  Fourier{-}based approach: characteristic function.}
+\CommentTok{  Parameter definitions see function BCC\_call\_value.\textquotesingle{}\textquotesingle{}\textquotesingle{}}
+\NormalTok{  c1 }\OperatorTok{=}\NormalTok{ kappa\_v }\OperatorTok{*}\NormalTok{ theta\_v}
+\NormalTok{  c2 }\OperatorTok{=} \OperatorTok{{-}}\NormalTok{np.sqrt((rho }\OperatorTok{*}\NormalTok{ sigma\_v }\OperatorTok{*}\NormalTok{ u }\OperatorTok{*} \OtherTok{1j} \OperatorTok{{-}}\NormalTok{ kappa\_v)}\OperatorTok{**} \DecValTok{2} \OperatorTok{{-}}\NormalTok{ sigma\_v }\OperatorTok{**} \DecValTok{2} \OperatorTok{*}\NormalTok{ (}\OperatorTok{{-}}\NormalTok{u }\OperatorTok{*} \OtherTok{1j} \OperatorTok{{-}}\NormalTok{ u }\OperatorTok{**} \DecValTok{2}\NormalTok{))}
+\NormalTok{  c3 }\OperatorTok{=}\NormalTok{ (kappa\_v }\OperatorTok{{-}}\NormalTok{ rho }\OperatorTok{*}\NormalTok{ sigma\_v }\OperatorTok{*}\NormalTok{ u }\OperatorTok{*} \OtherTok{1j} \OperatorTok{+}\NormalTok{ c2) }\OperatorTok{/}\NormalTok{ (kappa\_v }\OperatorTok{{-}}\NormalTok{ rho }\OperatorTok{*}\NormalTok{ sigma\_v }\OperatorTok{*}\NormalTok{ u }\OperatorTok{*} \OtherTok{1j} \OperatorTok{{-}}\NormalTok{ c2)}
+\NormalTok{  H1 }\OperatorTok{=}\NormalTok{ (r }\OperatorTok{*}\NormalTok{ u }\OperatorTok{*} \OtherTok{1j} \OperatorTok{*}\NormalTok{ T }\OperatorTok{+}\NormalTok{ (c1 }\OperatorTok{/}\NormalTok{ sigma\_v }\OperatorTok{**} \DecValTok{2}\NormalTok{)}\OperatorTok{*}\NormalTok{ ((kappa\_v }\OperatorTok{{-}}\NormalTok{ rho }\OperatorTok{*}\NormalTok{ sigma\_v }\OperatorTok{*}\NormalTok{ u }\OperatorTok{*} \OtherTok{1j} \OperatorTok{+}\NormalTok{ c2) }\OperatorTok{*}\NormalTok{ T}\OperatorTok{{-}} \DecValTok{2} \OperatorTok{*}\NormalTok{ np.log((}\DecValTok{1} \OperatorTok{{-}}\NormalTok{ c3 }\OperatorTok{*}\NormalTok{ np.exp(c2 }\OperatorTok{*}\NormalTok{ T)) }\OperatorTok{/}\NormalTok{ (}\DecValTok{1} \OperatorTok{{-}}\NormalTok{ c3))))}
+\NormalTok{  H2 }\OperatorTok{=}\NormalTok{ ((kappa\_v }\OperatorTok{{-}}\NormalTok{ rho }\OperatorTok{*}\NormalTok{ sigma\_v }\OperatorTok{*}\NormalTok{ u }\OperatorTok{*} \OtherTok{1j} \OperatorTok{+}\NormalTok{ c2) }\OperatorTok{/}\NormalTok{ sigma\_v }\OperatorTok{**} \DecValTok{2}\OperatorTok{*}\NormalTok{ ((}\DecValTok{1} \OperatorTok{{-}}\NormalTok{ np.exp(c2 }\OperatorTok{*}\NormalTok{ T)) }\OperatorTok{/}\NormalTok{ (}\DecValTok{1} \OperatorTok{{-}}\NormalTok{ c3 }\OperatorTok{*}\NormalTok{ np.exp(c2 }\OperatorTok{*}\NormalTok{ T))))}
+\NormalTok{  char\_func\_value }\OperatorTok{=}\NormalTok{ np.exp(H1 }\OperatorTok{+}\NormalTok{ H2 }\OperatorTok{*}\NormalTok{ v0)}
+  \ControlFlowTok{return}\NormalTok{ char\_func\_value}
+
+\KeywordTok{def}\NormalTok{ M76\_char\_func(u, T, lamb, mu, delta):}
+  \CommentTok{\textquotesingle{}\textquotesingle{}\textquotesingle{} Valuation of European call option in M76 model via Lewis (2001)}
+\CommentTok{  Fourier{-}based approach: characteristic function.}
+\CommentTok{  Parameter definitions see function M76\_call\_value.\textquotesingle{}\textquotesingle{}\textquotesingle{}}
+\NormalTok{  omega }\OperatorTok{=} \OperatorTok{{-}}\NormalTok{lamb }\OperatorTok{*}\NormalTok{ (np.exp(mu }\OperatorTok{+} \FloatTok{0.5} \OperatorTok{*}\NormalTok{ delta }\OperatorTok{**} \DecValTok{2}\NormalTok{) }\OperatorTok{{-}} \DecValTok{1}\NormalTok{)}
+\NormalTok{  char\_func\_value }\OperatorTok{=}\NormalTok{ np.exp((}\OtherTok{1j} \OperatorTok{*}\NormalTok{ u }\OperatorTok{*}\NormalTok{ omega }\OperatorTok{+}\NormalTok{ lamb }\OperatorTok{*}\NormalTok{ (np.exp(}\OtherTok{1j} \OperatorTok{*}\NormalTok{ u }\OperatorTok{*}\NormalTok{ mu }\OperatorTok{{-}}\NormalTok{ u }\OperatorTok{**} \DecValTok{2} \OperatorTok{*}\NormalTok{ delta }\OperatorTok{**} \DecValTok{2} \OperatorTok{*} \FloatTok{0.5}\NormalTok{) }\OperatorTok{{-}} \DecValTok{1}\NormalTok{)) }\OperatorTok{*}\NormalTok{ T)}
+  \ControlFlowTok{return}\NormalTok{ char\_func\_value}
+
+\KeywordTok{def}\NormalTok{ M76\_char\_func\_sa(u, T, r, sigma, lamb, mu, delta):}
+  \CommentTok{\textquotesingle{}\textquotesingle{}\textquotesingle{} Valuation of European call option in M76 model via Lewis (2001)}
+\CommentTok{  Fourier{-}based approach: characteristic function "jump component".}
+\CommentTok{  Parameter definitions see function M76\_call\_value.\textquotesingle{}\textquotesingle{}\textquotesingle{}}
+\NormalTok{  omega }\OperatorTok{=}\NormalTok{ r }\OperatorTok{{-}} \FloatTok{0.5} \OperatorTok{*}\NormalTok{ sigma }\OperatorTok{**} \DecValTok{2} \OperatorTok{{-}}\NormalTok{ lamb }\OperatorTok{*}\NormalTok{ (np.exp(mu }\OperatorTok{+} \FloatTok{0.5} \OperatorTok{*}\NormalTok{ delta }\OperatorTok{**} \DecValTok{2}\NormalTok{) }\OperatorTok{{-}} \DecValTok{1}\NormalTok{)}
+\NormalTok{  char\_func\_value }\OperatorTok{=}\NormalTok{ np.exp((}\OtherTok{1j} \OperatorTok{*}\NormalTok{ u }\OperatorTok{*}\NormalTok{ omega }\OperatorTok{{-}} \FloatTok{0.5} \OperatorTok{*}\NormalTok{ u }\OperatorTok{**} \DecValTok{2} \OperatorTok{*}\NormalTok{ sigma }\OperatorTok{**} \DecValTok{2}\OperatorTok{+}\NormalTok{ lamb }\OperatorTok{*}\NormalTok{ (np.exp(}\OtherTok{1j} \OperatorTok{*}\NormalTok{ u }\OperatorTok{*}\NormalTok{ mu }\OperatorTok{{-}}\NormalTok{ u }\OperatorTok{**} \DecValTok{2} \OperatorTok{*}\NormalTok{ delta }\OperatorTok{**} \DecValTok{2} \OperatorTok{*} \FloatTok{0.5}\NormalTok{)}\OperatorTok{{-}} \DecValTok{1}\NormalTok{)) }\OperatorTok{*}\NormalTok{ T)}
+  \ControlFlowTok{return}\NormalTok{ char\_func\_value}
+
+\ControlFlowTok{if} \VariableTok{\_\_name\_\_} \OperatorTok{==} \StringTok{\textquotesingle{}\_\_main\_\_\textquotesingle{}}\NormalTok{:}
+  \CommentTok{\#}
+  \CommentTok{\# Example Parameters CIR85 Model}
+  \CommentTok{\#}
+\NormalTok{  kappa\_r, theta\_r, sigma\_r, r0, T }\OperatorTok{=} \FloatTok{0.3}\NormalTok{, }\FloatTok{0.04}\NormalTok{, }\FloatTok{0.1}\NormalTok{, }\FloatTok{0.04}\NormalTok{, T}
+\NormalTok{  B0T }\OperatorTok{=}\NormalTok{ B([kappa\_r, theta\_r, sigma\_r, r0, T]) }\CommentTok{\# discount factor}
+\NormalTok{  r }\OperatorTok{=} \OperatorTok{{-}}\NormalTok{np.log(B0T) }\OperatorTok{/}\NormalTok{ T}
+  \CommentTok{\#}
+  \CommentTok{\# Example Values}
+  \CommentTok{\#}
+  \BuiltInTok{print}\NormalTok{(}\StringTok{"M76 Value }\SpecialCharTok{\%10.4f}\StringTok{"} \OperatorTok{\%}\NormalTok{ M76\_call\_value(S0, K, T, r, v0, lamb, mu, delta))}
+  \BuiltInTok{print}\NormalTok{(}\StringTok{"H93 Value }\SpecialCharTok{\%10.4f}\StringTok{"} \OperatorTok{\%}\NormalTok{ H93\_call\_value(S0, K, T, r, kappa\_v, theta\_v, sigma\_v, rho, v0))}
+  \BuiltInTok{print}\NormalTok{(}\StringTok{"BCC97 Value }\SpecialCharTok{\%10.4f}\StringTok{"} \OperatorTok{\%}\NormalTok{ BCC\_call\_value(S0, K, T, r, kappa\_v, theta\_v,sigma\_v, rho, v0, lamb, mu, delta))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## M76 Value     7.7611
+## H93 Value     6.8672
+## BCC97 Value     8.2942
 \end{verbatim}
 
   \bibliography{book.bib,packages.bib}
